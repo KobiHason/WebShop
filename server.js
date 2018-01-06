@@ -1,26 +1,59 @@
 
-var express = require ('express');
-var morgan = require('morgan');
-var mongoose = require('mongoose');
+var express     = require ('express');
+var morgan      = require('morgan');
+var mongoose    = require('mongoose');
+var bodyParser  = require('body-parser');
+var ejs         = require('ejs');
+var engine      =require('ejs-mate');
 
+
+var User = require('./models/user');
 var app = express();
 
-mongoose.connect('mongodb://root:123abc@ds239177.mlab.com:39177/webshop' , function(err){
+
+
+
+
+mongoose.connect('mongodb://root:123abc@ds239217.mlab.com:39217/onlinestore' , function(err){
   if (err){console.log(err);}
   else {console.log("Connected to DB ");}   });
 
 //middleware
- app.use(morgan('dev'));
+
+
+//bootstrap css and js files for express
+
+app.use(express.static(__dirname + '/public'));
+app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true } ));
 
 
 
 
-app.get('/' , function(req , res ){
-var name ="kobi";  res.json("Hello "+ name); });
+
+// ejs files
+app.engine('ejs' ,engine);
+app.set('wiew engine' , 'ejs');
+
+//routes to every ejs template
+
+//
+var mainRoutes =  require('./public/routes/main.js');
+app.use(mainRoutes);
+// var mainkRoutes =  require('./public/routes/maink.js');
+// app.use(mainkRoutes);
+
+//
+//
+ var userRoutes =  require('./public/routes/user.js');
+ app.use(userRoutes);
 
 
-app.get('/catman' , function(req , res ){
- res.json("Iron man "); });
+// var mainRoutes = require('./routes/main');
+// var userRoutes = require('./public/routes/users.');
+//  app.use(usersRoutes);
+// // app.use(mainRoutes);
 
 
 

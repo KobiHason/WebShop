@@ -1,17 +1,26 @@
+
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
-
+var crypto = require('crypto');
 var Schema = mongoose.Schema;
 
-/*the user schema attribuutes  / fileds     */
 
+// email: { type: String, unique: true, lowercase: true},
+// password: String,
+// firstname:  String,
+// lastname:  String,
+// profile: {  picture: {type: String, default: ''} },
+
+/* The user schema attributes / characteristics / fields */
 var UserSchema = new Schema({
 
   email: { type: String, unique: true, lowercase: true},
   password: String,
 
+  firstname:  String,
+   lastname:  String,
   profile: {
-    name: { type: String, default: ''},
+
     picture: { type: String, default: ''}
   },
 
@@ -22,11 +31,6 @@ var UserSchema = new Schema({
     // item: { type: Schema.Types.ObjectId, ref: ''}
   }]
 });
-
-
-
-
-
 
 /*Hashing the passsword  before moving to DB   */
 
@@ -45,12 +49,10 @@ UserSchema.pre('save', function(next) {
 
 
 
-
 /*Compare the passsword for validation in the DB  */
 UserSchema.methods.comparePassword = function(password) {
   return bcrypt.compareSync(password, this.password);
 }
-
 
 
 
