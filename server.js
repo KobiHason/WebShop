@@ -1,63 +1,76 @@
+var express      = require('express');
+var morgan       = require('morgan');
+var mongoose     = require('mongoose');
+var bodyParser   = require('body-parser');
+var ejs          = require('ejs');
+var engine       = require('ejs-mate');
+var session      = require('express-session');
+var cookieParser = require('cookie-parser');
+var flash        = require('express-flash');
+var MongoStore   = require('connect-mongo/es5')(session);
+var passport     = require('passport');
+var secret       = require('./config/secret');
+var User        = require('./models/user');
 
-var express     = require ('express');
-var morgan      = require('morgan');
-var mongoose    = require('mongoose');
-var bodyParser  = require('body-parser');
-var ejs         = require('ejs');
-var engine      =require('ejs-mate');
-
-
-var User = require('./models/user');
 var app = express();
 
 
 
 
+// redirect to config->secret.js and holding the port and DB link
+mongoose.connect(secret.database, function(err) {
+  if (err) {    console.log(err);  }
+  else { console.log("Connected to the database"); }
+});
 
-mongoose.connect('mongodb://root:123abc@ds239217.mlab.com:39217/onlinestore' , function(err){
-  if (err){console.log(err);}
-  else {console.log("Connected to DB ");}   });
-
-//middleware
 
 
-//bootstrap css and js files for express
-
+// Middleware
 app.use(express.static(__dirname + '/public'));
+
 app.use(morgan('dev'));
+
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true } ));
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cookieParser());
+app.use(session({
+  resave: true,     saveUninitialized: true,    secret: secret.secretKey,
+  store: new MongoStore({ url: secret.database, autoReconnect: true})         }));
+
+app.use(flash());
+
+app.use(passport.initialize());
+
+app.use(passport.session());
+
+app.use(function(req, res, next)
+    {
+  res.locals.user = req.user;       next();           });
+
+
+
+// JS templates
+app.engine('ejs', engine);
+app.set('view engine', 'ejs');
 
 
 
 
 
-// ejs files
-app.engine('ejs' ,engine);
-app.set('wiew engine' , 'ejs');
-
-//routes to every ejs template
-
-//
-var mainRoutes =  require('./public/routes/main.js');
+// routes
+var mainRoutes = require('./routes/main.js');
+var userRoutes = require('./routes/user.js');
 app.use(mainRoutes);
-// var mainkRoutes =  require('./public/routes/maink.js');
-// app.use(mainkRoutes);
-
-//
-//
- var userRoutes =  require('./public/routes/user.js');
- app.use(userRoutes);
-
-
-// var mainRoutes = require('./routes/main');
-// var userRoutes = require('./public/routes/users.');
-//  app.use(usersRoutes);
-// // app.use(mainRoutes);
+app.use(userRoutes);
 
 
 
-app.listen(3000,function(err){
-  if(err) throw err;
-  else console.log("Server is Running on port 3000");
+
+
+
+app.listen(secret.port, function(err) {
+  if (err) throw err;
+  console.log("The server is up and running on  port  " + secret.port);
 });

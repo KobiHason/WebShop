@@ -1,0 +1,17 @@
+body {
+  padding-top: 100px;
+}
+
+#navbar-gap {
+  margin-top: -4%;
+
+}
+
+
+footer {
+    margin: center;
+    padding: auto auto;
+    height: 330px;
+    background-color: #1e2127;
+    color: #ffffff;
+}
