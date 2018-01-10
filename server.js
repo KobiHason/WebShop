@@ -59,7 +59,7 @@ app.set('view engine', 'ejs');
 
 
 
-// routes
+// routes 
 var mainRoutes = require('./routes/main.js');
 var userRoutes = require('./routes/user.js');
 app.use(mainRoutes);
