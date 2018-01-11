@@ -59,12 +59,13 @@ app.set('view engine', 'ejs');
 
 
 
-// routes 
+// routes
+var adminRoutes = require('./routes/admin');
 var mainRoutes = require('./routes/main.js');
 var userRoutes = require('./routes/user.js');
+app.use(adminRoutes);
 app.use(mainRoutes);
 app.use(userRoutes);
-
 
 
 
