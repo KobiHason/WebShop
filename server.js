@@ -11,6 +11,7 @@ var MongoStore   = require('connect-mongo/es5')(session);
 var passport     = require('passport');
 var secret       = require('./config/secret');
 var User        = require('./models/user');
+var Category    = require('./models/category');
 
 var app = express();
 
@@ -46,12 +47,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(function(req, res, next)
-    {
-  res.locals.user = req.user;       next();           });
+{  res.locals.user = req.user;    next();    });
+
+
+// items categories
+  app.use(function(req, res, next) {
+    Category.find({}, function(err, categories) {
+      if (err) return next(err);
+      res.locals.categories = categories;
+      next();
+    });
+  });
 
 
 
-// JS templates
+
+// EJS templates
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 
@@ -61,12 +72,13 @@ app.set('view engine', 'ejs');
 
 // routes
 var adminRoutes = require('./routes/admin');
-var mainRoutes = require('./routes/main.js');
-var userRoutes = require('./routes/user.js');
+var mainRoutes  = require('./routes/main.js');
+var userRoutes  = require('./routes/user.js');
+var apiRoutes   = require('./api/api.js');
 app.use(adminRoutes);
 app.use(mainRoutes);
 app.use(userRoutes);
-
+app.use('/api', apiRoutes);
 
 
 
